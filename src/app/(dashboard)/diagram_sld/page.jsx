@@ -31,7 +31,7 @@ const InitalMeterData = () => {
     {
       activePowerTotalTag: apiData?.M1_Active_Power_Total_kW,
       activeCurrentAvgTag: apiData?.M1_Current_Average_A,
-      activeVoltageAvgTag: apiData?.M1_Active_Power_Demand_kW,
+      activeVoltageAvgTag: apiData?.["M1_Voltage_L-L_Phase_CA_V"],
       top: 420,
       left: 176,
     },
@@ -39,7 +39,7 @@ const InitalMeterData = () => {
     {
       activePowerTotalTag: apiData?.M2_Active_Power_Total_kW,
       activeCurrentAvgTag: apiData?.M2_Current_Average_A,
-      activeVoltageAvgTag: apiData?.M2_Active_Power_Demand_kW,
+      activeVoltageAvgTag: apiData?.["M2_Voltage_L-L_Phase_CA_V"],
       top: 420,
       left: 903,
     },
@@ -51,9 +51,12 @@ const InitalMeterData = () => {
       console.log("fetch Data hit");
       try {
         console.log("try method hit");
-        const res = await fetch(`${config.BASE_URL}/nodered/nodered-realtimedata`, {
-          method: `GET`,
-        });
+        const res = await fetch(
+          `${config.BASE_URL}/nodered/nodered-realtimedata`,
+          {
+            method: `GET`,
+          }
+        );
         const resResult = await res.json();
         if (res.ok) {
           setApiData(resResult);
@@ -100,14 +103,14 @@ const InitalMeterData = () => {
         {MeterTags.map((meter, index) => (
           <div
             key={index}
-            className="absolute flex border-1 border-red-500 flex-col items-center justify-around z-40 w-[83px] h-[104px]"
+            className="absolute flex flex-col items-center justify-around z-40 w-[83px] h-[104px]"
             style={{
               top: `${meter.top}px`,
               left: `${meter.left}px`,
             }}
           >
             <span className="meterReadingUnit4Lt2">
-              {meter.activePowerTotalTag}
+              {meter.activePowerTotalTag || "00.00"}
             </span>
             <span className="meterReadingUnit4Lt2">
               {meter.activeCurrentAvgTag || "00.00"}

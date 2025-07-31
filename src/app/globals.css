@@ -152,20 +152,11 @@
   }
 }
 
-.meterReadingUnit4,
-.meterReadingUnit4Lt2,
-.meterReadingUnit4Lt1 {
+.meterReadingUnit4Lt2 {
   color: rgb(5, 248, 5);
   font-weight: 500;
+  font-size: 17px;
   font-family: var(--font-fira-mono), sans-serif;
-}
-
-.meterReadingUnit4Lt1 {
-  font-size: 14px;
-}
-
-.meterReadingUnit4Lt2 {
-  font-size: 14px;
 }
 
 .meterDataText {
