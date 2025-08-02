@@ -6,7 +6,7 @@ import AddUserTab from "../../../components/AddUser";
 import RolesTab from "../../../components/ManageRole";
 
 export default function UserManagement() {
-  const [activeTab, setActiveTab] = useState("view");
+  const [activeTab, setActiveTab] = useState("roles");
 
   return (
     <div className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg shadow-lg border-2    max-w-screen h-[81vh] overflow-y-auto ">
@@ -17,13 +17,14 @@ export default function UserManagement() {
       {/* Tabs */}
       <div className="flex flex-wrap gap-6 md:gap-16 border-b-2 border-[rgba(0,0,0,0.14)] mt-6 md:mt-10 pb-2">
         <button
-          onClick={() => setActiveTab("view")}
+          onClick={() => setActiveTab("roles")}
           className={`font-raleway text-base md:text-[16.439px] font-semibold leading-normal transition-colors ${
-            activeTab === "view"
+            activeTab === "roles"
               ? "text-[#1A68B2]"
               : "text-black dark:text-white"
-          }`}>
-          View Users
+          }`}
+        >
+          Roles
         </button>
         <button
           onClick={() => setActiveTab("add")}
@@ -31,25 +32,27 @@ export default function UserManagement() {
             activeTab === "add"
               ? "text-[#1A68B2]"
               : "text-black dark:text-white"
-          }`}>
+          }`}
+        >
           Add Users
         </button>
         <button
-          onClick={() => setActiveTab("roles")}
+          onClick={() => setActiveTab("view")}
           className={`font-raleway text-base md:text-[16.439px] font-semibold leading-normal transition-colors ${
-            activeTab === "roles"
+            activeTab === "view"
               ? "text-[#1A68B2]"
               : "text-black dark:text-white"
-          }`}>
-          Roles
+          }`}
+        >
+          View Users
         </button>
       </div>
 
       {/* Render Active Tab */}
       <div className="mt-4">
-        {activeTab === "view" && <ViewUsersTab />}
-        {activeTab === "add" && <AddUserTab />}
         {activeTab === "roles" && <RolesTab />}
+        {activeTab === "add" && <AddUserTab />}
+        {activeTab === "view" && <ViewUsersTab />}
       </div>
     </div>
   );

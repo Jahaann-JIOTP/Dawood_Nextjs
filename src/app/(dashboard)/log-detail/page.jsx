@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-// import CustomLoader from "/components/customLoader/CustomLoader";
+// import CustomLoader from "@/components/customLoader/CustomLoader";
 import Swal from "sweetalert2";
 
 const LogDetails = () => {
@@ -21,66 +21,33 @@ const LogDetails = () => {
   const meterName = searchParams.get("meter-name");
   const router = useRouter();
 
-  // const getMeterLogsData = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch(
-  //       `${config.BASE_URL}${config.DIAGRAM.LOGS_DATA}`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           type,
-  //           meters: meter_id,
-  //           start_date: startDate,
-  //           end_date: endDate,
-  //         }),
-  //       }
-  //     );
+  const getMeterLogsData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5000/logs_data`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type,
+          meters: meter_id,
+          start_date: startDate,
+          end_date: endDate,
+        }),
+      });
 
-  //     if (response.ok) {
-  //       const resResult = await response.json();
-  //       setMeterLogsData(resResult.data);
-  //       setLoading(false);
-  //     } else {
-  //       console.error("Failed to fetch logs:", response.statusText);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error.message);
-  //   }
-  // };
-const getMeterLogsData = async () => {
-  setLoading(true);
-  try {
-    const queryParams = new URLSearchParams({
-      type,
-      meters: meter_id,
-      start_date: startDate,
-      end_date: endDate,
-    });
-
-    const response = await fetch(
-      `${config.BASE_URL}${config.DIAGRAM.LOGS_DATA}?${queryParams.toString()}`
-    );
-
-    if (response.ok) {
-      const resResult = await response.json();
-      setMeterLogsData(resResult.data);
-    } else {
-      console.error("Failed to fetch logs:", response.statusText);
+      if (response.ok) {
+        const resResult = await response.json();
+        setMeterLogsData(resResult.data);
+        setLoading(false);
+      } else {
+        console.error("Failed to fetch logs:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
     }
-  } catch (error) {
-    console.error("Error:", error.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
-
+  };
   useEffect(() => {
     getMeterLogsData();
   }, [startDate, endDate]);
@@ -92,6 +59,7 @@ const getMeterLogsData = async () => {
         .filter((key) => key !== "meterId")
     )
   );
+
   const exportToExcel = async () => {
     if (meterLogsData.length === 0) {
       Swal.fire({
@@ -116,7 +84,7 @@ const getMeterLogsData = async () => {
             newRow["Date"] = new Date(row[col]).toLocaleDateString();
             newRow["Time"] = new Date(row[col]).toLocaleTimeString();
           } else {
-            newRow[col.replace(/_/g, " ")] =
+            newRow[col.replace(/[_-]/g, " ")] =
               typeof row[col] === "number"
                 ? Math.abs(row[col]) > 1e9
                   ? 0
@@ -269,80 +237,80 @@ const getMeterLogsData = async () => {
         {/* {loading ? (
           <CustomLoader />
         ) : ( */}
-          <div className="rounded overflow-hidden border border-gray-300">
-            <div className="max-h-[63vh] overflow-y-auto custom-scrollbar-report">
-              <table className="w-full border-collapse table-fixed">
-                <thead className=" text-white sticky top-0 z-10">
-                  <tr className="bg-[#1D5999] border-t-2 border-[#1D5999]">
-                    {columns.flatMap((col, index) => {
-                      if (col === "time") {
-                        return [
-                          <th
-                            key={`date-${index}`}
-                            className="border border-gray-300 px-3 py-2 text-sm font-semibold capitalize text-center"
-                          >
-                            Date
-                          </th>,
-                          <th
-                            key={`time-${index}`}
-                            className="border border-gray-300 px-3 py-2 text-sm font-semibold capitalize text-center"
-                          >
-                            Time
-                          </th>,
-                        ];
-                      } else {
-                        return (
-                          <th
-                            key={`col-${index}`}
-                            className="border border-gray-300 px-3 py-2 text-sm font-semibold capitalize text-center"
-                          >
-                            {col.replace(/_/g, " ")}
-                          </th>
-                        );
-                      }
-                    })}
-                  </tr>
-                </thead>
-                <tbody>
-                  {meterLogsData.map((row, rowIdx) => (
-                    <tr key={rowIdx}>
-                      {columns.map((col, colIdx) =>
-                        col === "time" ? (
-                          [
-                            <td
-                              key={`${rowIdx}-date-${colIdx}`}
-                              className="border border-gray-200 px-3 py-1 text-center text-sm"
-                            >
-                              {new Date(row[col]).toLocaleDateString()}
-                            </td>,
-                            <td
-                              key={`${rowIdx}-time-${colIdx}`}
-                              className="border border-gray-200 px-3 py-1 text-center text-sm"
-                            >
-                              {new Date(row[col]).toLocaleTimeString()}
-                            </td>,
-                          ]
-                        ) : (
+        <div className="rounded overflow-hidden border border-gray-300">
+          <div className="max-h-[63vh] overflow-y-auto custom-scrollbar-report">
+            <table className="w-full border-collapse table-fixed">
+              <thead className=" text-white sticky top-0 z-10">
+                <tr className="bg-[#1D5999] border-t-2 border-[#1D5999]">
+                  {columns.flatMap((col, index) => {
+                    if (col === "time") {
+                      return [
+                        <th
+                          key={`date-${index}`}
+                          className="border border-gray-300 px-3 py-2 text-sm font-semibold capitalize text-center"
+                        >
+                          Date
+                        </th>,
+                        <th
+                          key={`time-${index}`}
+                          className="border border-gray-300 px-3 py-2 text-sm font-semibold capitalize text-center"
+                        >
+                          Time
+                        </th>,
+                      ];
+                    } else {
+                      return (
+                        <th
+                          key={`col-${index}`}
+                          className="border border-gray-300 px-3 py-2 text-sm font-semibold capitalize text-center"
+                        >
+                          {col.replace(/[_-]/g, " ")}
+                        </th>
+                      );
+                    }
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {meterLogsData.map((row, rowIdx) => (
+                  <tr key={rowIdx}>
+                    {columns.map((col, colIdx) =>
+                      col === "time" ? (
+                        [
                           <td
-                            key={`${rowIdx}-${col}-${colIdx}`}
+                            key={`${rowIdx}-date-${colIdx}`}
                             className="border border-gray-200 px-3 py-1 text-center text-sm"
                           >
-                            {typeof row[col] === "number"
-                              ? Math.abs(row[col]) > 1e9
-                                ? 0
-                                : Math.round(row[col] * 100) / 100
-                              : row[col] == null
+                            {new Date(row[col]).toLocaleDateString()}
+                          </td>,
+                          <td
+                            key={`${rowIdx}-time-${colIdx}`}
+                            className="border border-gray-200 px-3 py-1 text-center text-sm"
+                          >
+                            {new Date(row[col]).toLocaleTimeString()}
+                          </td>,
+                        ]
+                      ) : (
+                        <td
+                          key={`${rowIdx}-${col}-${colIdx}`}
+                          className="border border-gray-200 px-3 py-1 text-center text-sm"
+                        >
+                          {typeof row[col] === "number"
+                            ? Math.abs(row[col]) > 1e9
                               ? 0
-                              : row[col]}
-                          </td>
-                        )
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                              : Math.round(row[col] * 100) / 100
+                            : row[col] == null
+                            ? 0
+                            : row[col]}
+                        </td>
+                      )
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+        </div>
         {/* )} */}
       </div>
     </div>

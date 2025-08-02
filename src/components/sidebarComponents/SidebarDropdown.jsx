@@ -67,7 +67,16 @@ export default function SidebarDropdown({
           } gap-2`}
         >
           {item.submenu.map((sub) => {
-            const activePath = path === sub.href;
+            const isSldActive = [
+              "/diagram_sld",
+              "/meter",
+              "/datalogs",
+              "/log-detail",
+            ].some((p) => {
+              return path.startsWith(p);
+            });
+            const activePath = isSldActive || path === sub.href;
+
             return (
               <Link
                 key={sub.id}

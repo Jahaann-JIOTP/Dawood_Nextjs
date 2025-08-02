@@ -120,36 +120,43 @@ const EnergyCostReport = () => {
   const generationMeters = meters.filter((m) => m.category === "generation");
   const consumptionMeters = meters.filter((m) => m.category === "consumption");
 
-  const hasConsumption = selectedMeters.some((id) => consumptionMeters.map((m) => m.id).includes(id));
-  const hasGeneration = selectedMeters.some((id) => generationMeters.map((m) => m.id).includes(id));
+  const hasConsumption = selectedMeters.some((id) =>
+    consumptionMeters.map((m) => m.id).includes(id)
+  );
+  const hasGeneration = selectedMeters.some((id) =>
+    generationMeters.map((m) => m.id).includes(id)
+  );
 
   const handleSelectGroup = (group, checked) => {
-    console.log("🔄 Select All clicked:", checked);
     const groupIds = group.map((m) => m.id);
-    setSelectedMeters((prev) => (checked ? [...new Set([...prev, ...groupIds])] : prev.filter((id) => !groupIds.includes(id))));
+    setSelectedMeters((prev) =>
+      checked
+        ? [...new Set([...prev, ...groupIds])]
+        : prev.filter((id) => !groupIds.includes(id))
+    );
   };
 
-  const isGroupFullySelected = (group) => group.every((m) => selectedMeters.includes(m.id));
+  const isGroupFullySelected = (group) =>
+    group.every((m) => selectedMeters.includes(m.id));
 
   const toggleModal = () => {
-    console.log("🔄 Toggling modal. Current state:", isModalOpen);
     setIsModalOpen((prev) => !prev);
     setError(null); // Clear any previous errors when opening modal
   };
 
   const closeModal = () => {
-    console.log("❌ Closing modal explicitly");
     setIsModalOpen(false);
     setError(null); // Clear errors on close
   };
 
   const handleMeterSelect = (meterId) => {
-    console.log("🔍 Selecting meter:", meterId);
     try {
       setSelectedMeters((prev) => {
         const isSelected = prev.includes(meterId);
-        const newSelection = isSelected ? prev.filter((id) => id !== meterId) : [...prev, meterId];
-        console.log("✅ New selection:", newSelection);
+        const newSelection = isSelected
+          ? prev.filter((id) => id !== meterId)
+          : [...prev, meterId];
+
         return newSelection;
       });
     } catch (err) {
@@ -159,7 +166,6 @@ const EnergyCostReport = () => {
   };
 
   const tryAlternativeParameters = async (originalPayload) => {
-    console.log("🔄 Trying alternative parameters...");
     const successfulResults = [];
 
     for (const meterId of selectedMeters) {
@@ -188,7 +194,6 @@ const EnergyCostReport = () => {
           if (response.ok) {
             const data = await response.json();
             if (data && Array.isArray(data) && data.length > 0) {
-              console.log(`✅ Found data with ${meterId} - ${altSuffix}`);
               successfulResults.push({
                 meterId,
                 suffix: altSuffix,
@@ -198,7 +203,7 @@ const EnergyCostReport = () => {
             }
           }
         } catch (error) {
-          console.log(`❌ Failed ${meterId} - ${altSuffix}:`, error.message);
+          console.error(`❌ Failed ${meterId} - ${altSuffix}:`, error.message);
         }
       }
     }
@@ -207,7 +212,12 @@ const EnergyCostReport = () => {
       const processedData = successfulResults.map((result) => ({
         ...result.data,
         suffix: result.suffix,
-        consumption: result.data.consumption || result.data.energy || result.data.kwh || result.data.value || 0,
+        consumption:
+          result.data.consumption ||
+          result.data.energy ||
+          result.data.kwh ||
+          result.data.value ||
+          0,
         meterId: result.meterId,
       }));
       return { success: true, data: processedData };
@@ -219,7 +229,14 @@ const EnergyCostReport = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!startDate || !endDate || !startTime || !endTime || selectedMeters.length === 0 || !rates) {
+    if (
+      !startDate ||
+      !endDate ||
+      !startTime ||
+      !endTime ||
+      selectedMeters.length === 0 ||
+      !rates
+    ) {
       alert("Please fill out all fields including date, time, and rates.");
       return;
     }
@@ -234,11 +251,7 @@ const EnergyCostReport = () => {
 
     const requests = [];
 
-    console.log("🔍 Processing selected meters:", selectedMeters);
-
     selectedMeters.forEach((meterId) => {
-      console.log("🔍 Processing meter ID:", meterId);
-
       if (meterId === "M1_") {
         requests.push({
           meterId: "M1",
@@ -250,7 +263,6 @@ const EnergyCostReport = () => {
           suffix: primaryParameters["M1_"].export,
           type: "export",
         });
-        console.log("✅ Added M1_ (Wapda) with import/export parameters");
       }
 
       if (meterId === "M2_") {
@@ -259,17 +271,11 @@ const EnergyCostReport = () => {
           suffix: primaryParameters["M2_"].generation,
           type: "generation",
         });
-        console.log("✅ Added M2_ (Solar) with generation parameter");
       }
     });
 
     const meterIds = [...new Set(requests.map((req) => req.meterId))];
     const suffixes = requests.map((req) => req.suffix);
-
-    console.log("📊 Selected Meters:", selectedMeters);
-    console.log("📊 Unique meterIds for API:", meterIds);
-    console.log("📊 All suffixes:", suffixes);
-    console.log("📊 Request details:", requests);
 
     const payload = {
       start_date: startDate,
@@ -280,8 +286,6 @@ const EnergyCostReport = () => {
       rates: Number.parseFloat(rates),
       suffixes: suffixes,
     };
-
-    console.log("📤 Final Payload:", JSON.stringify(payload, null, 2));
 
     setLoading(true);
     setError(null); // Clear previous errors
@@ -302,10 +306,9 @@ const EnergyCostReport = () => {
       }
 
       const data = await response.json();
-      console.log("📥 API Response:", data);
 
       if (!data || (Array.isArray(data) && data.length === 0)) {
-        console.log("⚠️ Empty response, trying alternative parameters...");
+        ("⚠️ Empty response, trying alternative parameters...");
         const altResult = await tryAlternativeParameters(payload);
         if (altResult.success) {
           setFetchedData(altResult.data);
@@ -323,7 +326,8 @@ const EnergyCostReport = () => {
         processedData = data.map((item, index) => ({
           ...item,
           suffix: suffixes[index] || "",
-          consumption: item.consumption || item.energy || item.kwh || item.value || 0,
+          consumption:
+            item.consumption || item.energy || item.kwh || item.value || 0,
           meterId: item.meterId || meterIds[index] || `M${index + 1}`,
         }));
       } else if (typeof data === "object") {
@@ -331,16 +335,11 @@ const EnergyCostReport = () => {
           {
             ...data,
             suffix: suffixes[0] || "",
-            consumption: data.consumption || data.energy || data.kwh || data.value || 0,
+            consumption:
+              data.consumption || data.energy || data.kwh || data.value || 0,
             meterId: data.meterId || meterIds[0] || "M1",
           },
         ];
-      }
-
-      console.log("✅ Processed Data:", processedData);
-
-      if (processedData.length === 0 || processedData.every((item) => item.consumption === 0)) {
-        console.log("⚠️ Data found but all consumption values are zero");
       }
 
       setFetchedData(processedData);
@@ -360,7 +359,13 @@ const EnergyCostReport = () => {
       return;
     }
 
-    const headers = ["No", "Sources", "KWH", "Unit Price (PKR)", "Total Price (PKR)"];
+    const headers = [
+      "No",
+      "Sources",
+      "KWH",
+      "Unit Price (PKR)",
+      "Total Price (PKR)",
+    ];
     const rows = fetchedData.map((item, index) => {
       const totalPrice = item.consumption * Number.parseFloat(rates);
       return [
@@ -384,7 +389,9 @@ const EnergyCostReport = () => {
     const dataForExcel = [titleRow, [], headers, ...rows];
 
     const worksheet = XLSX.utils.aoa_to_sheet(dataForExcel);
-    worksheet["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }];
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
+    ];
 
     const titleCellAddress = XLSX.utils.encode_cell({ r: 0, c: 0 });
     worksheet[titleCellAddress] = {
@@ -406,7 +413,13 @@ const EnergyCostReport = () => {
       };
     });
 
-    worksheet["!cols"] = [{ wpx: 50 }, { wpx: 150 }, { wpx: 100 }, { wpx: 120 }, { wpx: 150 }];
+    worksheet["!cols"] = [
+      { wpx: 50 },
+      { wpx: 150 },
+      { wpx: 100 },
+      { wpx: 120 },
+      { wpx: 150 },
+    ];
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Billing Report");
@@ -414,7 +427,6 @@ const EnergyCostReport = () => {
   };
 
   useEffect(() => {
-    console.log(" Modal state changed, isModalOpen:", isModalOpen, "Selected Meters:", selectedMeters);
     if (isModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -427,7 +439,6 @@ const EnergyCostReport = () => {
 
   useEffect(() => {
     return () => {
-      console.log("🧹 Component unmounting: Final cleanup");
       document.body.style.overflow = "unset";
       setIsModalOpen(false);
     };
@@ -453,7 +464,8 @@ const EnergyCostReport = () => {
   if (isSubmitted && (!fetchedData || fetchedData.length === 0)) {
     return (
       <div className="p-6 text-red-500">
-        No data available. Please try again or check the API server at http://localhost:5000/energy-cost.
+        No data available. Please try again or check the API server at
+        http://localhost:5000/energy-cost.
         <button
           onClick={() => setIsSubmitted(false)}
           className="ml-4 px-2 py-1 bg-blue-500 text-white rounded"
@@ -467,10 +479,15 @@ const EnergyCostReport = () => {
   if (isSubmitted && fetchedData && fetchedData.length > 0) {
     return (
       <div className="relative shadow-lg rounded-[8px] w-full mt-[-7px]">
-        <div className="absolute inset-0 bg-white dark:bg-gray-800" style={{ opacity: 1 }} />
+        <div
+          className="absolute inset-0 bg-white dark:bg-gray-800"
+          style={{ opacity: 1 }}
+        />
         <div className="relative z-10 p-6 h-[39.9vw] flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-bold text-gray-700 dark:text-white">Energy Cost Report</h1>
+            <h1 className="text-xl font-bold text-gray-700 dark:text-white">
+              Energy Cost Report
+            </h1>
             <div className="flex space-x-4">
               <button
                 onClick={() => setIsSubmitted(false)}
@@ -484,7 +501,11 @@ const EnergyCostReport = () => {
                   stroke="currentColor"
                   className="w-6 h-6"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </button>
             </div>
@@ -495,15 +516,23 @@ const EnergyCostReport = () => {
           <div className="mb-8">
             <div className="flex justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-700 dark:text-white">Invoice To:</h2>
-                <p className="text-gray-600 dark:text-white">Dawood Floor mills</p>
+                <h2 className="text-lg font-semibold text-gray-700 dark:text-white">
+                  Invoice To:
+                </h2>
+                <p className="text-gray-600 dark:text-white">
+                  Dawood Floor mills
+                </p>
               </div>
               <div className="text-right">
-                <h2 className="text-lg font-semibold text-gray-700 dark:text-white">Jahaann Technologies</h2>
+                <h2 className="text-lg font-semibold text-gray-700 dark:text-white">
+                  Jahaann Technologies
+                </h2>
                 <p className="text-gray-600 dark:text-white">
                   22-C Block, G.E.C.H.S, Phase 3 Peco Road, Lahore, Pakistan
                 </p>
-                <p className="text-gray-600 dark:text-white">Phone: +924235949261</p>
+                <p className="text-gray-600 dark:text-white">
+                  Phone: +924235949261
+                </p>
               </div>
             </div>
           </div>
@@ -513,12 +542,17 @@ const EnergyCostReport = () => {
           <div className="mb-4">
             <div className="flex justify-between">
               <div>
-                <button onClick={handleExport} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                <button
+                  onClick={handleExport}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
                   Export
                 </button>
               </div>
               <div className="text-right">
-                <h2 className="text-lg font-bold text-blue-700">Billing Report</h2>
+                <h2 className="text-lg font-bold text-blue-700">
+                  Billing Report
+                </h2>
                 <div className="text-gray-600 dark:text-white mt-2">
                   <p>
                     Start Date & Time: {startDate} {startTime}
@@ -537,29 +571,47 @@ const EnergyCostReport = () => {
                 <thead>
                   <tr className="bg-gray-100 text-center text-sm font-semibold text-gray-700 dark:bg-gray-900 dark:text-white">
                     <th className="border border-gray-300 px-4 py-2">No</th>
-                    <th className="border border-gray-300 px-4 py-2">Sources</th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Sources
+                    </th>
                     <th className="border border-gray-300 px-4 py-2">KWH</th>
-                    <th className="border border-gray-300 px-4 py-2">Unit Price (PKR)</th>
-                    <th className="border border-gray-300 px-4 py-2">Total Price (PKR)</th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Unit Price (PKR)
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Total Price (PKR)
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {fetchedData.map((item, index) => {
-                    const totalPrice = item.consumption * Number.parseFloat(rates);
+                    const totalPrice =
+                      item.consumption * Number.parseFloat(rates);
                     return (
-                      <tr key={index} className={`text-center ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
+                      <tr
+                        key={index}
+                        className={`text-center ${
+                          index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        }`}
+                      >
                         <td className="border border-gray-300 px-4 py-2 bg-[#3989c6] dark:bg-blue-900 text-white font-semibold">
                           {index + 1}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 font-medium text-gray-700 dark:bg-gray-900 dark:text-white">
                           {(() => {
                             if (item.meterId === "M1") {
-                              if (item.suffix.includes("Import")) return "Wapda Import";
-                              if (item.suffix.includes("Export")) return "Wapda Export";
+                              if (item.suffix.includes("Import"))
+                                return "Wapda Import";
+                              if (item.suffix.includes("Export"))
+                                return "Wapda Export";
                               return "Wapda";
                             }
-                            if (item.meterId === "M2") return "Solar Generation";
-                            return meters.find((m) => m.id === item.meterId)?.name || "Unknown";
+                            if (item.meterId === "M2")
+                              return "Solar Generation";
+                            return (
+                              meters.find((m) => m.id === item.meterId)?.name ||
+                              "Unknown"
+                            );
                           })()}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 font-medium text-gray-700 dark:bg-gray-900 dark:text-white">
@@ -583,7 +635,13 @@ const EnergyCostReport = () => {
                 <div className="flex justify-between items-center text-lg font-bold text-white bg-[#3989c6] dark:bg-blue-900 p-4 rounded-md">
                   <span>GRAND TOTAL</span>
                   <span>
-                    {fetchedData.reduce((acc, item) => acc + item.consumption * Number.parseFloat(rates), 0).toFixed(2)}{" "}
+                    {fetchedData
+                      .reduce(
+                        (acc, item) =>
+                          acc + item.consumption * Number.parseFloat(rates),
+                        0
+                      )
+                      .toFixed(2)}{" "}
                     PKR
                   </span>
                 </div>
@@ -592,13 +650,17 @@ const EnergyCostReport = () => {
 
             {hasGeneration && (
               <div className="mt-4 p-4 border rounded bg-[#3989c6] dark:bg-blue-900 text-white text-sm">
-                <h3 className="text-lg font-bold text-white mb-1">Report Summary:</h3>
+                <h3 className="text-lg font-bold text-white mb-1">
+                  Report Summary:
+                </h3>
                 {(() => {
                   let wapdaImport = 0;
                   let wapdaExport = 0;
                   let solarGeneration = 0;
 
-                  const wapdaRows = fetchedData.filter((item) => item.meterId === "M1");
+                  const wapdaRows = fetchedData.filter(
+                    (item) => item.meterId === "M1"
+                  );
                   wapdaRows.forEach((row) => {
                     if (row.suffix.includes("Import")) {
                       wapdaImport = row.consumption * Number.parseFloat(rates);
@@ -608,25 +670,34 @@ const EnergyCostReport = () => {
                     }
                   });
 
-                  const solarRow = fetchedData.find((item) => item.meterId === "M2");
-                  if (solarRow) solarGeneration = solarRow.consumption * Number.parseFloat(rates);
+                  const solarRow = fetchedData.find(
+                    (item) => item.meterId === "M2"
+                  );
+                  if (solarRow)
+                    solarGeneration =
+                      solarRow.consumption * Number.parseFloat(rates);
 
                   const netWapdaCost = Math.max(wapdaImport - wapdaExport, 0);
 
                   return (
                     <>
                       <p>
-                        <strong>Wapda Import Cost:</strong> {wapdaImport.toFixed(2)} PKR
+                        <strong>Wapda Import Cost:</strong>{" "}
+                        {wapdaImport.toFixed(2)} PKR
                       </p>
                       <p>
-                        <strong>Wapda Export Saving:</strong> {wapdaExport.toFixed(2)} PKR
+                        <strong>Wapda Export Saving:</strong>{" "}
+                        {wapdaExport.toFixed(2)} PKR
                       </p>
                       <p>
-                        <strong>Solar Generation Value:</strong> {solarGeneration.toFixed(2)} PKR
+                        <strong>Solar Generation Value:</strong>{" "}
+                        {solarGeneration.toFixed(2)} PKR
                       </p>
                       <p className="text-[16px] flex">
                         <strong>Net Wapda Cost (Import - Export):</strong>
-                        <p className="bg-white rounded-md text-black px-2 py-0 ml-2">{netWapdaCost.toFixed(2)} PKR</p>
+                        <p className="bg-white rounded-md text-black px-2 py-0 ml-2">
+                          {netWapdaCost.toFixed(2)} PKR
+                        </p>
                       </p>
                     </>
                   );
@@ -636,11 +707,13 @@ const EnergyCostReport = () => {
 
             <div className="mt-8 text-sm text-gray-600 dark:text-white">
               <p className="border-l-4 border-[#3a8ac5] mb-2 pl-2">
-                Thank you very much for doing business with us. We look forward to working with you again.
+                Thank you very much for doing business with us. We look forward
+                to working with you again.
               </p>
               <div className="flex justify-between mt-4 border-t pt-4 bg-[#e6e4e4] dark:bg-gray-900 p-4">
                 <p>
-                  Generated on: {new Date().toLocaleTimeString()}, Date: {new Date().toISOString().split("T")[0]}
+                  Generated on: {new Date().toLocaleTimeString()}, Date:{" "}
+                  {new Date().toISOString().split("T")[0]}
                 </p>
                 <p>Generated By: Jahaann Technologies</p>
                 <p>Email: info@jahaann.com</p>
@@ -657,13 +730,20 @@ const EnergyCostReport = () => {
       id="energy-cost-report"
       className="relative shadow-lg rounded-[8px] w-full h-[43.5vw] max-md:h-[83vh] border-t-2 border-red-600 mt-[-7px]"
     >
-      <div className="absolute inset-0 bg-white dark:bg-gray-800 border-t-2 border-red-600" style={{ opacity: 1 }} />
+      <div
+        className="absolute inset-0 bg-white dark:bg-gray-800 border-t-2 border-red-600"
+        style={{ opacity: 1 }}
+      />
       <div className="relative z-10 p-6">
-        <h1 className="text-lg font-bold text-gray-700 dark:text-white mb-4">Energy Cost Report</h1>
+        <h1 className="text-lg font-bold text-gray-700 dark:text-white mb-4">
+          Energy Cost Report
+        </h1>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-[13px] font-bold text-[#626469] dark:text-white mb-2">Sources</label>
+            <label className="block text-[13px] font-bold text-[#626469] dark:text-white mb-2">
+              Sources
+            </label>
             <button
               type="button"
               onClick={toggleModal}
@@ -675,16 +755,22 @@ const EnergyCostReport = () => {
               }}
             >
               <span className="relative z-100">
-                {selectedMeters.length > 0 ? `Selected: ${selectedMeters.length} Meters` : "Select Sources"}
+                {selectedMeters.length > 0
+                  ? `Selected: ${selectedMeters.length} Meters`
+                  : "Select Sources"}
               </span>
             </button>
 
             {selectedMeters.length > 0 && (
               <div className="mt-2">
-                <label className="block text-[13px] font-bold text-[#626469] dark:text-white">Selected Sources</label>
+                <label className="block text-[13px] font-bold text-[#626469] dark:text-white">
+                  Selected Sources
+                </label>
                 <input
                   type="text"
-                  value={selectedMeters.map((id) => meters.find((meter) => meter.id === id)?.name).join(", ")}
+                  value={selectedMeters
+                    .map((id) => meters.find((meter) => meter.id === id)?.name)
+                    .join(", ")}
                   readOnly
                   className="w-full p-2 border border-[#9f9fa3] rounded-md text-gray-700 dark:bg-gray-700 dark:text-white"
                 />
@@ -693,7 +779,9 @@ const EnergyCostReport = () => {
           </div>
 
           <div>
-            <label className="block text-[13px] font-bold text-[#626469] dark:text-white">Rates</label>
+            <label className="block text-[13px] font-bold text-[#626469] dark:text-white">
+              Rates
+            </label>
             <input
               type="number"
               step="0.01"
@@ -707,7 +795,9 @@ const EnergyCostReport = () => {
 
           <div className="flex items-center justify-between w-full space-x-4">
             <div className="flex-1">
-              <label className="block text-[13px] font-bold text-[#626469] dark:text-white">Start Date</label>
+              <label className="block text-[13px] font-bold text-[#626469] dark:text-white">
+                Start Date
+              </label>
               <input
                 type="date"
                 value={startDate}
@@ -718,7 +808,9 @@ const EnergyCostReport = () => {
               />
             </div>
             <div className="flex-1">
-              <label className="block text-[13px] font-bold text-[#626469] dark:text-white">End Date</label>
+              <label className="block text-[13px] font-bold text-[#626469] dark:text-white">
+                End Date
+              </label>
               <input
                 type="date"
                 value={endDate}
@@ -746,22 +838,34 @@ const EnergyCostReport = () => {
             <div
               className="absolute inset-0  bg-opacity-50"
               onClick={closeModal}
-              style={{ pointerEvents: 'auto' }}
+              style={{ pointerEvents: "auto" }}
             />
             <div
               className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl w-[400px] max-w-[90vw] max-h-[80vh] overflow-hidden z-[1010]"
-              style={{ pointerEvents: 'auto' }}
-              onClick={e => e.stopPropagation()}
+              style={{ pointerEvents: "auto" }}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="bg-blue-200 dark:bg-blue-800 p-3 rounded-t-lg flex justify-between items-center">
-                <h2 className="text-sm font-bold text-gray-700 dark:text-white">Select Sources</h2>
+                <h2 className="text-sm font-bold text-gray-700 dark:text-white">
+                  Select Sources
+                </h2>
                 <button
                   type="button"
                   onClick={closeModal}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white p-1 rounded"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -771,10 +875,14 @@ const EnergyCostReport = () => {
                     <input
                       type="checkbox"
                       checked={isGroupFullySelected(generationMeters)}
-                      onChange={(e) => handleSelectGroup(generationMeters, e.target.checked)}
+                      onChange={(e) =>
+                        handleSelectGroup(generationMeters, e.target.checked)
+                      }
                       className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                     />
-                    <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Select All</span>
+                    <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Select All
+                    </span>
                   </label>
                 </div>
                 {generationMeters.map((meter) => (
@@ -786,7 +894,9 @@ const EnergyCostReport = () => {
                         onChange={() => handleMeterSelect(meter.id)}
                         className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                       />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{meter.name}</span>
+                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        {meter.name}
+                      </span>
                     </label>
                   </div>
                 ))}

@@ -25,7 +25,7 @@ const InitalMeterData = () => {
   const [apiData, setApiData] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
-  console.log("==============", apiData);
+
   const MeterTags = [
     // Wapda
     {
@@ -46,11 +46,8 @@ const InitalMeterData = () => {
   ];
 
   useEffect(() => {
-    console.log("Nodered Api hit");
     const fetchData = async () => {
-      console.log("fetch Data hit");
       try {
-        console.log("try method hit");
         const res = await fetch(
           `${config.BASE_URL}/nodered/nodered-realtimedata`,
           {
@@ -74,9 +71,9 @@ const InitalMeterData = () => {
       ? `${parseFloat(apiData[key]).toFixed(2)} ${unit}`
       : "--";
   };
-  console.log(getVal);
+
   return (
-    <div className="w-full bg-white h-[75vh] border-t-3  rounded-md overflow-auto">
+    <div className="w-full bg-white dark:bg-gray-800 h-[81vh] border-t-3  rounded-md overflow-auto">
       <div className="relative w-[1200px] h-[600px] mx-auto">
         {MeterData.map((meter) => (
           <button

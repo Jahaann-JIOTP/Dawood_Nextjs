@@ -23,16 +23,14 @@ export const privilegeConfig = {
     tab: "Home",
   },
 
- 
-
   Diagram: {
     href: "/diagram_sld",
     icon: faProjectDiagram,
     label: "DIAGRAM",
     tab: "Diagram",
-    matchPaths: ["/diagram_sld", "/diagram_processor"],
+    matchPaths: ["/diagram_sld", "/meter", "/datalogs", "/log-detail"],
   },
-    Alarms: {
+  Alarms: {
     href: "/all_Alarms",
     icon: faBell,
     label: "ALARMS",
@@ -48,15 +46,13 @@ export const privilegeConfig = {
     matchPaths: ["/energy_cost_report", "/energy_usage_report"],
   },
 
-  Trends:{
+  Trends: {
     href: "/trends",
     icon: faFileAlt,
     label: "TRENDS",
     tab: "Trends",
     matchPaths: ["/trends"],
-
   },
-
 
   "User Management": {
     href: "/user_management",
@@ -71,8 +67,8 @@ export const privilegeOrder = [
   "Dashboard",
   "Diagram",
   "Reports",
-   "Trends",
-    "Alarms",
+  "Trends",
+  "Alarms",
   "User Management",
 ];
 
@@ -123,19 +119,18 @@ export const sidebarLinksMap = {
           href: "/diagram_sld",
           icon: PlantOverview,
         },
-     
       ],
     },
   ],
 
- Trends: [
+  Trends: [
     {
       title: "Customized Trends",
       icon: TransformerIcon,
       href: "/trends",
     },
   ],
-"Alarms": [
+  Alarms: [
     {
       title: "All alarms ",
       icon: TransformerIcon,
@@ -152,9 +147,8 @@ export const sidebarLinksMap = {
       icon: TransformerIcon,
       href: "/alarms_Threshold",
     },
+  ],
 
-  ],  
-  
   Reports: [
     {
       title: "Energy Cost Report",

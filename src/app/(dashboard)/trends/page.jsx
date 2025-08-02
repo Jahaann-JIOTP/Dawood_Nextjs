@@ -168,7 +168,6 @@ function CustomTrend() {
               });
 
               if (hasNonEmptyData) {
-                console.log(`✅ Successfully fetched data for ${parameter}`);
                 return {
                   parameter,
                   data: dataArr,
@@ -397,7 +396,7 @@ function CustomTrend() {
         dateAxis.renderer.minorGrid.template.strokeWidth = 0.5;
       }
     } catch (e) {
-      console.log("Minor grid not available for date axis");
+      console.error("Minor grid not available for date axis", e);
     }
 
     try {
@@ -410,7 +409,7 @@ function CustomTrend() {
         valueAxis.renderer.minorGrid.template.strokeWidth = 0.5;
       }
     } catch (e) {
-      console.log("Minor grid not available for value axis");
+      console.error("Minor grid not available for value axis", e);
     }
 
     // Create series for each selected parameter

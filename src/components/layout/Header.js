@@ -46,7 +46,7 @@ const Header = ({ handleTabClick, activeTab }) => {
       if (res.ok) {
         const data = await res.json();
         const privileges = data?.role?.privelleges?.map((p) => p.name) || [];
-        console.log("User privileges:", privileges);
+
         setUserPrivileges(privileges);
       } else {
         console.error("Failed to fetch user profile");
@@ -77,13 +77,16 @@ const Header = ({ handleTabClick, activeTab }) => {
     } catch (err) {
       console.error("Alarm error:", err);
       // Handle different types of errors gracefully
-      if (err.code === 'ECONNREFUSED' || err.code === 'ERR_NETWORK' || err.message.includes('Network Error')) {
+      if (
+        err.code === "ECONNREFUSED" ||
+        err.code === "ERR_NETWORK" ||
+        err.message.includes("Network Error")
+      ) {
         setError(null); // Don't show error for network issues, just show no alarms
       } else {
         setError("Failed to fetch alarms.");
       }
-      
-     
+
       setBellIcon("basil_notification-solid.png");
       setNewAlarmCount(0);
       setAlarms([]);
@@ -125,7 +128,6 @@ const Header = ({ handleTabClick, activeTab }) => {
     setNotificationVisible(!isNotificationVisible);
 
   useEffect(() => {
-    console.log('use effecrt working')
     fetchUserDetails();
     // fetchAlarms();
     // const interval = setInterval(fetchAlarms, 5000);
@@ -209,34 +211,53 @@ const Header = ({ handleTabClick, activeTab }) => {
 
           {isNotificationVisible && (
             <div className="absolute top-full right-0 w-80 bg-white dark:bg-gray-800 shadow-lg border rounded-lg z-[9999] p-4">
-  <div className="flex justify-between items-center mb-4">
-    <p className="text-lg font-semibold text-black dark:text-white text-center w-full">
-      Alarms
-    </p>
-    <button
-      className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-      onClick={() => setNotificationVisible(false)}
-    >
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
+              <div className="flex justify-between items-center mb-4">
+                <p className="text-lg font-semibold text-black dark:text-white text-center w-full">
+                  Alarms
+                </p>
+                <button
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  onClick={() => setNotificationVisible(false)}
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
               {/* Content */}
               <div className="p-4">
                 {isLoading ? (
                   <div className="text-center py-8">
-                    <div className="text-gray-500 dark:text-gray-400">Loading alarms...</div>
+                    <div className="text-gray-500 dark:text-gray-400">
+                      Loading alarms...
+                    </div>
                   </div>
                 ) : alarms.length > 0 ? (
                   <>
                     {/* Alarms List */}
                     <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                       {alarms.map((alarm, idx) => (
-                        <div key={idx} className="flex items-start space-x-3 p-2 border-b border-gray-100 dark:border-gray-600 last:border-b-0">
+                        <div
+                          key={idx}
+                          className="flex items-start space-x-3 p-2 border-b border-gray-100 dark:border-gray-600 last:border-b-0"
+                        >
                           <div className="flex-shrink-0 mt-1">
-                            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 2C6.477 2 3.5 4.977 3.5 8.5c0 4.5 6.5 11.5 6.5 11.5s6.5-7 6.5-11.5C16.5 4.977 13.523 2 10 2z"/>
+                            <svg
+                              className="w-5 h-5 text-blue-600"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M10 2C6.477 2 3.5 4.977 3.5 8.5c0 4.5 6.5 11.5 6.5 11.5s6.5-7 6.5-11.5C16.5 4.977 13.523 2 10 2z" />
                             </svg>
                           </div>
                           <div className="flex-1 min-w-0">
@@ -273,19 +294,17 @@ const Header = ({ handleTabClick, activeTab }) => {
                   <>
                     {/* No Alarms State */}
                     <div className="text-center py-8 ">
-                      
                       <div className="relative mx-auto  ">
-                       
-                        
                         {/* Center bell */}
                         <div className=" flex items-center flex-col gap-7  justify-center ">
-                      <img src="./bell123.png" alt="bell" class="w-[1200px]" />
-
+                          <img
+                            src="./bell123.png"
+                            alt="bell"
+                            class="w-[1200px]"
+                          />
                         </div>
-                        
-        
                       </div>
-                      
+
                       <div className="text-gray-600 dark:text-gray-400 text-base mt-8  ">
                         No Alarms available yet!
                       </div>

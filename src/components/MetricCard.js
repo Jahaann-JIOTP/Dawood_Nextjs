@@ -1,15 +1,14 @@
 import * as React from "react";
 
-function MetricCard({ label, value, color, darkTextColor, className }) {
+function MetricCard({ label, value, darkTextColor, className }) {
   return (
     <section
-      className="p-3 border-t-3 border-[#1f5897] rounded-md bg-white dark:bg-gray-900 h-max bg-opacity-90"
+      className="p-3 border-t-3 border-[#1f5897] rounded-md bg-white dark:bg-gray-800 h-max bg-opacity-90"
       style={{ boxShadow: "0 4px 10px rgba(0,0,0,0.15)" }}
     >
       <div className="flex flex-col max-sm:gap-1 gap-[0.3vw] items-center">
         <p
-          className={`max-sm:text-xs text-[0.7vw] font-medium text-center ${className}`}
-          style={{ color: color || "#1F5897" }}
+          className={`text-[16px] font-semibold text-[#1F5897] dark:text-[#D1D5DB] transition-colors duration-300${className}`}
         >
           {label}
         </p>

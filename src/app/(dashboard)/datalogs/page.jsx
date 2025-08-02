@@ -6,11 +6,10 @@ import { ImArrowLeft2 } from "react-icons/im";
 const page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const ltScheme = searchParams.get("lt-scheme");
   const [isHovered, setIsHovered] = useState(false);
-  const meterId = searchParams.get("meter_id");
+  const meterId = searchParams.get("boxId");
   const tab = searchParams.get("tab");
-  const meterName = searchParams.get("meter-name");
+  const meterName = searchParams.get("type");
 
   return (
     <div className="w-full bg-white p-5 h-[81vh] rounded-md border-t-3 border-[#1F5897] overflow-auto">
@@ -43,7 +42,7 @@ const page = () => {
         <div className="w-full flex items-center justify-center">
           {tab === "volts" ? (
             <img src="./voltage-logs.png" alt="Voltage logs" />
-          ) :tab === "energy" ? (
+          ) : tab === "energy" ? (
             <img src="/energy-logs.png" alt="energy logs" />
           ) : tab === "power" ? (
             <img src="power-logs.png" alt="energy logs" />
@@ -52,8 +51,8 @@ const page = () => {
           )}
         </div>
         {/* voltage logs buttons */}
-       
-        {tab=== "volts" ? (
+
+        {tab === "volts" ? (
           <>
             <button
               className="absolute w-[57px] h-[59px]  top-[105px] cursor-pointer   left-[754px]"

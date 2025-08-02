@@ -64,7 +64,7 @@ export default function DashboardLayout({ children }) {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
-  
+
   useEffect(() => {
     setActiveTab((prevTab) => {
       if (
@@ -96,15 +96,33 @@ export default function DashboardLayout({ children }) {
   if (!isAuthenticated) return null;
 
   return (
-    <div className={` flex flex-col bg-[#f7f7f7] dark:bg-transparent`}>
+    // <div className={` flex flex-col bg-[#f7f7f7] dark:bg-transparent`}>
+    //   <TopHeader />
+    //   <Header handleTabClick={handleTabClick} />
+
+    //   <div className="flex overflow-x-hidden  xl:p-3 gap-3">
+    //     <Sidebar activeTab={activeTab} handleTabClick={handleTabClick} />
+    //     <main
+    //       className="flex-1 w-full overflow-x-auto bg-center bg-contain bg-no-repeat"
+    //       style={{ backgroundImage: 'url("./bglogo.png")' }}
+    //     >
+    //       {children}
+    //     </main>
+    //   </div>
+    // </div>
+    <div
+      className={` flex flex-col bg-[#f7f7f7] dark:bg-gray-900 overflow-hidden`}
+    >
       <TopHeader />
       <Header handleTabClick={handleTabClick} />
 
-      <div className="flex overflow-x-hidden  xl:p-3 gap-3">
+      <div className="flex px-4 gap-[0.7vw]">
         <Sidebar activeTab={activeTab} handleTabClick={handleTabClick} />
         <main
-          className="flex-1 w-full overflow-x-auto  rounded-xl    bg-center bg-contain bg-no-repeat border-t-2 border-[#1d5998] "
-          style={{ backgroundImage: 'url("./bglogo.png")' }}>
+          // className="w-full h-full pb-5 md:p-auto md:h-[81vh] overflow-x-hidden overflow-y-auto bg-center bg-contain bg-no-repeat"
+          className="w-full h-full pb-5 md:p-auto md:h-[81vh] overflow-hidden bg-center bg-contain bg-no-repeat"
+          style={{ backgroundImage: 'url("./bglogo.png")' }}
+        >
           {children}
         </main>
       </div>
