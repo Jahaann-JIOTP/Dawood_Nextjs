@@ -15,30 +15,14 @@ import TimeBasedEnergyComparison from "@/components/dashboardComponents/timeBase
 import { useTheme } from "next-themes";
 
 const DashboardPage = () => {
-  const [expanded, setExpanded] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState("month");
-  const [selectedCompressor, setSelectedCompressor] = useState("Compressor1");
-  const [selectedSubMetric, setSelectedSubMetric] = useState("Import");
-  const [expandedCards, setExpandedCards] = useState({
-    airConsumption1: false,
-  });
   const { theme } = useTheme();
-  const [loading1, setLoading1] = useState(false);
-  const [error1, setError1] = useState(null);
   const [isDark, setIsDark] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
 
-  // States for dashboard data (first API)
   const [dashboardData, setDashboardData] = useState(null);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState(null);
   const [dashboardTimePeriod, setDashboardTimePeriod] = useState("today");
   const [realTimeData, setRealTimeData] = useState({});
-  console.log("...............", realTimeData.M1_Current_Average_A);
-
-  const [energyData, setEnergyData] = useState(null);
-  const [energyLoading, setEnergyLoading] = useState(true);
-  const energyChartRef = useRef(null);
 
   const [mounted, setMounted] = useState(false);
 
@@ -57,10 +41,9 @@ const DashboardPage = () => {
     }
   }, [dashboardTimePeriod, mounted]);
 
-  // Fetch dashboard data when dashboardTimePeriod changes
   const fetchDashboardData = async () => {
     setDashboardLoading(true);
-    setDashboardError(null); // Clear previous errors
+    setDashboardError(null);
 
     try {
       const response = await fetch(
@@ -71,7 +54,7 @@ const DashboardPage = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            range: dashboardTimePeriod, // Payload with the range parameter
+            range: dashboardTimePeriod,
           }),
         }
       );
@@ -82,7 +65,6 @@ const DashboardPage = () => {
 
       const result = await response.json();
 
-      // Set the dashboard data from the API response
       setDashboardData(result.data || result);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -235,10 +217,10 @@ const DashboardPage = () => {
                       Source
                     </th>
                     <th className="px-2 sm:px-4 py-2 text-center font-medium border-r border-gray-300 dark:border-gray-600">
-                      Current avg (A)
+                      Current Avg (A)
                     </th>
                     <th className="px-2 sm:px-4 py-2 text-center font-medium border-r border-gray-300 dark:border-gray-600">
-                      Voltage L-L avg (V)
+                      Voltage L-L Avg (V)
                     </th>
                     <th className="px-2 sm:px-4 py-2 text-center font-medium border-r border-gray-300 dark:border-gray-600">
                       Total Power (kW)
@@ -265,30 +247,26 @@ const DashboardPage = () => {
                       </div>
                     </td>
                     <td className="px-2 sm:px-4 py-2 text-center text-gray-900 dark:text-gray-100 border-r border-gray-300 dark:border-gray-600 transition-colors duration-300">
-                      {realTimeData.M1_Current_Average_A}
+                      {realTimeData.M1_Current_Average_A || "0"}
                     </td>
                     <td className="px-2 sm:px-4 py-2 text-center text-gray-900 dark:text-gray-100 border-r border-gray-300 dark:border-gray-600 transition-colors duration-300">
-                      {realTimeData?.["M1_Voltage_L-L_Average_V"]}
+                      {realTimeData?.["M1_Voltage_L-L_Average_V"] || "0"}
                     </td>
                     <td className="px-2 sm:px-4 py-2 text-center text-gray-900 dark:text-gray-100 border-r border-gray-300 dark:border-gray-600 transition-colors duration-300">
-                      {realTimeData.M1_Active_Power_Total_kW}
+                      {realTimeData.M1_Active_Power_Total_kW || "0"}
                     </td>
                     <td className="px-2 sm:px-4 py-2 text-center">
                       <span
                         className={`inline-block w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2 ${
-                          Number.parseFloat(
-                            realTimeData?.["M1_Voltage_L-L_Average_V"]
-                          ) === 0
+                          realTimeData?.["M1_Voltage_L-L_Average_V"] === 0 ||
+                          !realTimeData?.["M1_Voltage_L-L_Average_V"]
                             ? "bg-red-500"
                             : "bg-green-500"
                         }`}
-                      >
-                        {}
-                      </span>
+                      ></span>
                       <span className="text-gray-900 dark:text-gray-100 transition-colors duration-300">
-                        {Number.parseFloat(
-                          realTimeData?.["M1_Voltage_L-L_Average_V"] === 0
-                        )
+                        {realTimeData?.["M1_Voltage_L-L_Average_V"] === 0 ||
+                        !realTimeData?.["M1_Voltage_L-L_Average_V"]
                           ? "Inactive"
                           : "Active"}
                       </span>
@@ -310,28 +288,26 @@ const DashboardPage = () => {
                       </div>
                     </td>
                     <td className="px-2 sm:px-4 py-2 text-center text-gray-900 dark:text-gray-100 border-r border-gray-300 dark:border-gray-600 transition-colors duration-300">
-                      {realTimeData.M2_Current_Average_A}
+                      {realTimeData.M2_Current_Average_A || "0"}
                     </td>
                     <td className="px-2 sm:px-4 py-2 text-center text-gray-900 dark:text-gray-100 border-r border-gray-300 dark:border-gray-600 transition-colors duration-300">
-                      {realTimeData?.["M2_Voltage_L-L_Average_V"]}
+                      {realTimeData?.["M2_Voltage_L-L_Average_V"] || "0"}
                     </td>
                     <td className="px-2 sm:px-4 py-2 text-center text-gray-900 dark:text-gray-100 border-r border-gray-300 dark:border-gray-600 transition-colors duration-300">
-                      {realTimeData.M2_Active_Power_Total_kW}
+                      {realTimeData.M2_Active_Power_Total_kW || "0"}
                     </td>
                     <td className="px-2 sm:px-4 py-2 text-center">
                       <span
                         className={`inline-block w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2 ${
-                          Number.parseFloat(
-                            realTimeData?.["M2_Voltage_L-L_Average_V"]
-                          ) === 0
+                          realTimeData?.["M2_Voltage_L-L_Average_V"] === 0 ||
+                          !realTimeData?.["M2_Voltage_L-L_Average_V"]
                             ? "bg-red-500"
                             : "bg-green-500"
                         }`}
                       ></span>
                       <span className="text-gray-900 dark:text-gray-100 transition-colors duration-300">
-                        {Number.parseFloat(
-                          realTimeData?.["M2_Voltage_L-L_Average_V"]
-                        ) === 0
+                        {realTimeData?.["M2_Voltage_L-L_Average_V"] === 0 ||
+                        !realTimeData?.["M2_Voltage_L-L_Average_V"]
                           ? "Inactive"
                           : "Active"}
                       </span>

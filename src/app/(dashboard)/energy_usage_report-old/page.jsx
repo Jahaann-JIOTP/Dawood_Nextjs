@@ -2,18 +2,14 @@
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 
-const EnergyCostReport = () => {
+const EnergyUsageReport = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedMeters, setSelectedMeters] = useState([]);
-  const [rates, setRates] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fetchedData, setFetchedData] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [error, setError] = useState(null); // New state for error tracking
 
   const meters = [
     { id: "M1_", name: "Wapda", category: "generation" },
@@ -129,11 +125,11 @@ const EnergyCostReport = () => {
 
   const handleSelectGroup = (group, checked) => {
     const groupIds = group.map((m) => m.id);
-    setSelectedMeters((prev) =>
-      checked
-        ? [...new Set([...prev, ...groupIds])]
-        : prev.filter((id) => !groupIds.includes(id))
-    );
+    if (checked) {
+      setSelectedMeters((prev) => [...new Set([...prev, ...groupIds])]);
+    } else {
+      setSelectedMeters((prev) => prev.filter((id) => !groupIds.includes(id)));
+    }
   };
 
   const isGroupFullySelected = (group) =>
@@ -141,28 +137,34 @@ const EnergyCostReport = () => {
 
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
-    setError(null); // Clear any previous errors when opening modal
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setError(null); // Clear errors on close
   };
 
   const handleMeterSelect = (meterId) => {
-    try {
-      setSelectedMeters((prev) => {
-        const isSelected = prev.includes(meterId);
-        const newSelection = isSelected
-          ? prev.filter((id) => id !== meterId)
-          : [...prev, meterId];
+    const selectedMeter = meters.find((m) => m.id === meterId);
+    const selectedCategory = selectedMeter?.category;
 
-        return newSelection;
-      });
-    } catch (err) {
-      console.error("❌ Error in handleMeterSelect:", err);
-      setError("Failed to update meter selection. Please try again.");
-    }
+    setSelectedMeters((prev) => {
+      const isSelected = prev.includes(meterId);
+      let updated = [...prev];
+
+      if (isSelected) {
+        updated = updated.filter((id) => id !== meterId);
+      } else {
+        const oppositeCategory =
+          selectedCategory === "generation" ? "consumption" : "generation";
+        const oppositeMeters = meters
+          .filter((m) => m.category === oppositeCategory)
+          .map((m) => m.id);
+        updated = updated.filter((id) => !oppositeMeters.includes(id));
+        updated.push(meterId);
+      }
+
+      return updated;
+    });
   };
 
   const tryAlternativeParameters = async (originalPayload) => {
@@ -182,7 +184,7 @@ const EnergyCostReport = () => {
         };
 
         try {
-          const response = await fetch("http://localhost:5000/energy-cost", {
+          const response = await fetch("http://localhost:5000/energy_usage", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -229,11 +231,16 @@ const EnergyCostReport = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const start = new Date(`${startDate}T${startTime}`);
-    const end = new Date(`${endDate}T${endTime}`);
+    if (!startDate || !endDate || selectedMeters.length === 0) {
+      alert("Please fill out all fields including date range and sources.");
+      return;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
     if (start >= end) {
-      alert("End date/time must be after start date/time.");
+      alert("End date must be after start date.");
       return;
     }
 
@@ -268,18 +275,14 @@ const EnergyCostReport = () => {
     const payload = {
       start_date: startDate,
       end_date: endDate,
-      start_time: startTime,
-      end_time: endTime,
       meterIds: meterIds,
-      rates: Number.parseFloat(rates),
       suffixes: suffixes,
     };
 
     setLoading(true);
-    setError(null); // Clear previous errors
 
     try {
-      const response = await fetch("http://localhost:5000/energy-cost", {
+      const response = await fetch("http://localhost:5000/energy_usage", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -289,14 +292,13 @@ const EnergyCostReport = () => {
       });
 
       if (!response.ok) {
-        console.error("API Error:", await response.text());
-        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
 
       if (!data || (Array.isArray(data) && data.length === 0)) {
-        ("⚠️ Empty response, trying alternative parameters...");
         const altResult = await tryAlternativeParameters(payload);
         if (altResult.success) {
           setFetchedData(altResult.data);
@@ -333,9 +335,20 @@ const EnergyCostReport = () => {
       setFetchedData(processedData);
       setIsSubmitted(true);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(`Failed to fetch data: ${error.message}`);
-      alert(`Error: ${error.message}\nPlease check the API server or network.`);
+      console.error("❌ Error fetching data:", error);
+      let errorMessage = "Failed to fetch data from the API.";
+
+      if (error.message.includes("Failed to fetch")) {
+        errorMessage +=
+          "\n\nPossible causes:\n• API server is not running on localhost:5000\n• CORS issues\n• Network connectivity problems";
+      } else if (error.message.includes("500")) {
+        errorMessage += "\n\nServer error - check API logs for details.";
+      } else if (error.message.includes("404")) {
+        errorMessage +=
+          "\n\nAPI endpoint not found - verify the URL is correct.";
+      }
+
+      alert(errorMessage + `\n\nError details: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -355,7 +368,7 @@ const EnergyCostReport = () => {
       "Total Price (PKR)",
     ];
     const rows = fetchedData.map((item, index) => {
-      const totalPrice = item.consumption * Number.parseFloat(rates);
+      const totalPrice = item.consumption * 0.0; // Placeholder for rates, adjust as needed
       return [
         index + 1,
         (() => {
@@ -368,12 +381,12 @@ const EnergyCostReport = () => {
           return meters.find((m) => m.id === item.meterId)?.name || "Unknown";
         })(),
         item.consumption.toFixed(2),
-        rates,
+        0.0, // Placeholder for rates, adjust as needed
         totalPrice.toFixed(2),
       ];
     });
 
-    const titleRow = ["Energy Cost Report"];
+    const titleRow = ["Energy Usage Report"];
     const dataForExcel = [titleRow, [], headers, ...rows];
 
     const worksheet = XLSX.utils.aoa_to_sheet(dataForExcel);
@@ -383,7 +396,7 @@ const EnergyCostReport = () => {
 
     const titleCellAddress = XLSX.utils.encode_cell({ r: 0, c: 0 });
     worksheet[titleCellAddress] = {
-      v: "Energy Cost Report",
+      v: "Energy Usage Report",
       s: {
         fill: { fgColor: { rgb: "0070C0" } },
         font: { sz: 16, bold: true, color: { rgb: "FFFFFF" } },
@@ -420,10 +433,11 @@ const EnergyCostReport = () => {
     } else {
       document.body.style.overflow = "unset";
     }
+
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isModalOpen, selectedMeters]); // Added selectedMeters to dependency array
+  }, [isModalOpen]);
 
   useEffect(() => {
     return () => {
@@ -432,49 +446,17 @@ const EnergyCostReport = () => {
     };
   }, []);
 
-  if (error) {
-    return (
-      <div className="p-6 text-red-500">
-        {error}
-        <button
-          onClick={() => {
-            setError(null);
-            setIsSubmitted(false);
-          }}
-          className="ml-4 px-2 py-1 bg-blue-500 text-white rounded"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  if (isSubmitted && (!fetchedData || fetchedData.length === 0)) {
-    return (
-      <div className="p-6 text-red-500">
-        No data available. Please try again or check the API server at
-        http://localhost:5000/energy-cost.
-        <button
-          onClick={() => setIsSubmitted(false)}
-          className="ml-4 px-2 py-1 bg-blue-500 text-white rounded"
-        >
-          Back
-        </button>
-      </div>
-    );
-  }
-
   if (isSubmitted && fetchedData && fetchedData.length > 0) {
     return (
-      <div className="relative shadow-lg rounded-[8px] w-full mt-[-7px]">
+      <div className="relative  rounded-md w-full mt-[-7px]">
         <div
-          className="absolute inset-0 bg-white dark:bg-gray-800"
+          className="absolute  inset-0 bg-white dark:bg-gray-800"
           style={{ opacity: 1 }}
         />
-        <div className="relative z-10 p-6 h-[39.9vw] flex flex-col">
+        <div className="relative  z-10 p-6 h-[39.9vw] flex flex-col">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-xl font-bold text-gray-700 dark:text-white">
-              Energy Cost Report
+              Energy Usage Report
             </h1>
             <div className="flex space-x-4">
               <button
@@ -528,26 +510,20 @@ const EnergyCostReport = () => {
           <div className="w-full h-[2px] bg-gradient-to-r from-blue-500 via-green-500 to-red-500 my-4" />
 
           <div className="mb-4">
-            <div className="flex justify-between">
-              <div>
-                <button
-                  onClick={handleExport}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                >
-                  Export
-                </button>
-              </div>
+            <div className="flex justify-between items-start">
+              <button
+                onClick={handleExport}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              >
+                Export
+              </button>
               <div className="text-right">
                 <h2 className="text-lg font-bold text-blue-700">
                   Billing Report
                 </h2>
                 <div className="text-gray-600 dark:text-white mt-2">
-                  <p>
-                    Start Date & Time: {startDate} {startTime}
-                  </p>
-                  <p>
-                    End Date & Time: {endDate} {endTime}
-                  </p>
+                  <p>Start Date: {startDate}</p>
+                  <p>End Date: {endDate}</p>
                 </div>
               </div>
             </div>
@@ -573,8 +549,7 @@ const EnergyCostReport = () => {
                 </thead>
                 <tbody>
                   {fetchedData.map((item, index) => {
-                    const totalPrice =
-                      item.consumption * Number.parseFloat(rates);
+                    const totalPrice = item.consumption * 0.0; // Placeholder for rates, adjust as needed
                     return (
                       <tr
                         key={index}
@@ -606,7 +581,7 @@ const EnergyCostReport = () => {
                           {item.consumption.toFixed(2)}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 font-medium text-gray-700 dark:bg-gray-900 dark:text-white">
-                          {rates}
+                          {0.0} {/* Placeholder for rates, adjust as needed */}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 bg-[#3989c6] dark:bg-blue-900 text-white font-semibold">
                           {totalPrice.toFixed(2)}
@@ -624,13 +599,9 @@ const EnergyCostReport = () => {
                   <span>GRAND TOTAL</span>
                   <span>
                     {fetchedData
-                      .reduce(
-                        (acc, item) =>
-                          acc + item.consumption * Number.parseFloat(rates),
-                        0
-                      )
+                      .reduce((acc, item) => acc + item.consumption * 0.0, 0)
                       .toFixed(2)}{" "}
-                    PKR
+                    PKR {/* Placeholder for rates, adjust as needed */}
                   </span>
                 </div>
               </div>
@@ -651,19 +622,17 @@ const EnergyCostReport = () => {
                   );
                   wapdaRows.forEach((row) => {
                     if (row.suffix.includes("Import")) {
-                      wapdaImport = row.consumption * Number.parseFloat(rates);
+                      wapdaImport = row.consumption * 0.0; // Placeholder for rates, adjust as needed
                     }
                     if (row.suffix.includes("Export")) {
-                      wapdaExport = row.consumption * Number.parseFloat(rates);
+                      wapdaExport = row.consumption * 0.0; // Placeholder for rates, adjust as needed
                     }
                   });
 
                   const solarRow = fetchedData.find(
                     (item) => item.meterId === "M2"
                   );
-                  if (solarRow)
-                    solarGeneration =
-                      solarRow.consumption * Number.parseFloat(rates);
+                  if (solarRow) solarGeneration = solarRow.consumption * 0.0; // Placeholder for rates, adjust as needed
 
                   const netWapdaCost = Math.max(wapdaImport - wapdaExport, 0);
 
@@ -716,15 +685,15 @@ const EnergyCostReport = () => {
   return (
     <div
       id="energy-cost-report"
-      className="relative shadow-lg rounded-[8px] w-full h-[43.5vw] max-md:h-[83vh] border-t-2 border-red-600 mt-[-7px]"
+      className="relative  rounded-2xl  w-full h-[43.5vw] max-md:h-[83vh] border-t-2 border-red-600 mt-[-7px]"
     >
       <div
-        className="absolute inset-0 bg-white dark:bg-gray-800 border-t-2 border-red-600"
+        className="absolute inset-0  rounded-2xl dark:bg-gray-800 border-t-2 border-red-600"
         style={{ opacity: 1 }}
       />
-      <div className="relative z-10 p-6">
+      <div className="relative  z-10  p-6">
         <h1 className="text-lg font-bold text-gray-700 dark:text-white mb-4">
-          Energy Cost Report
+          Energy Usage Report
         </h1>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -742,13 +711,12 @@ const EnergyCostReport = () => {
                 color: "#EFFFFF",
               }}
             >
-              <span className="relative z-100">
+              <span className="relative z-10">
                 {selectedMeters.length > 0
                   ? `Selected: ${selectedMeters.length} Meters`
                   : "Select Sources"}
               </span>
             </button>
-
             {selectedMeters.length > 0 && (
               <div className="mt-2">
                 <label className="block text-[13px] font-bold text-[#626469] dark:text-white">
@@ -766,23 +734,8 @@ const EnergyCostReport = () => {
             )}
           </div>
 
-          <div>
-            <label className="block text-[13px] font-bold text-[#626469] dark:text-white">
-              Rates
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              value={rates}
-              onChange={(e) => setRates(e.target.value)}
-              className="w-full p-2 border border-[#9f9fa3] rounded-md text-gray-700 dark:bg-gray-700 dark:text-white"
-              placeholder="0.0"
-              required
-            />
-          </div>
-
-          <div className="flex items-center justify-between w-full space-x-4">
-            <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 mr-2">
               <label className="block text-[13px] font-bold text-[#626469] dark:text-white">
                 Start Date
               </label>
@@ -795,7 +748,7 @@ const EnergyCostReport = () => {
                 max={endDate}
               />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 ml-2">
               <label className="block text-[13px] font-bold text-[#626469] dark:text-white">
                 End Date
               </label>
@@ -822,15 +775,15 @@ const EnergyCostReport = () => {
         </form>
 
         {isModalOpen && (
-          <div className="fixed inset-0 z-[10] flex items-center justify-center">
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center">
             <div
-              className="absolute inset-0  bg-opacity-50"
-              onClick={closeModal}
-              style={{ pointerEvents: "auto" }}
+              className="absolute inset-0 bg-opacity-50"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) setIsModalOpen(false);
+              }}
             />
             <div
               className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl w-[400px] max-w-[90vw] max-h-[80vh] overflow-hidden z-[1010]"
-              style={{ pointerEvents: "auto" }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="bg-blue-200 dark:bg-blue-800 p-3 rounded-t-lg flex justify-between items-center">
@@ -839,7 +792,7 @@ const EnergyCostReport = () => {
                 </h2>
                 <button
                   type="button"
-                  onClick={closeModal}
+                  onClick={() => setIsModalOpen(false)}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white p-1 rounded"
                 >
                   <svg
@@ -892,14 +845,14 @@ const EnergyCostReport = () => {
               <div className="flex justify-end p-4 space-x-3 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
-                  onClick={closeModal}
+                  onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 text-sm font-medium"
                 >
                   OK
                 </button>
                 <button
                   type="button"
-                  onClick={closeModal}
+                  onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 text-sm font-medium"
                 >
                   Close
@@ -913,4 +866,4 @@ const EnergyCostReport = () => {
   );
 };
 
-export default EnergyCostReport;
+export default EnergyUsageReport;

@@ -18,7 +18,7 @@ const page = () => {
 
   const getSingleMeterData = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/meter-data`, {
+      const response = await fetch(`${config.BASE_URL}/meter-data`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -845,7 +845,7 @@ const page = () => {
           title="Logs"
           onClick={() =>
             router.push(
-              `/logs?type=${activeTab}&lt_scheme=${ltScheme}&val=${activeTab}&meter_id=${id}&meter-name=${meterName}`
+              `/datalogs?type=${activeTab}&val=${activeTab}&meter_id=${boxId}&meter-name=${type}`
             )
           }
           className={`absolute right-[20px] bottom-[5px] border-1 border-[#1F5897] text-[#1F5897] dark:bg-gray-500 font-400 rounded text-[12px] flex flex-col items-center justify-center p-[7px] z-30  cursor-pointer`}

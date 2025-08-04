@@ -7,8 +7,8 @@ const page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isHovered, setIsHovered] = useState(false);
-  const meterId = searchParams.get("boxId");
-  const tab = searchParams.get("tab");
+  const meterId = searchParams.get("meter_id");
+  const tab = searchParams.get("val");
   const meterName = searchParams.get("type");
 
   return (

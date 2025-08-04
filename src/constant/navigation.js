@@ -43,7 +43,11 @@ export const privilegeConfig = {
     icon: faFileAlt,
     label: "REPORTS",
     tab: "Reports",
-    matchPaths: ["/energy_cost_report", "/energy_usage_report"],
+    matchPaths: [
+      "/energy_cost_report",
+      "/energy_usage_report",
+      // "/new-usage-report",
+    ],
   },
 
   Trends: {
@@ -160,6 +164,11 @@ export const sidebarLinksMap = {
       icon: TransformerIcon,
       href: "/energy_usage_report",
     },
+    // {
+    //   title: "new Energy Usage Report",
+    //   icon: TransformerIcon,
+    //   href: "/new-usage-report",
+    // },
   ],
 
   "User Management": [

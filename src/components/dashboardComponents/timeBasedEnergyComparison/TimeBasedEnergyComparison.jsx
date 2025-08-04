@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
 import { MdOutlineFullscreen, MdFullscreenExit } from "react-icons/md";
 import config from "@/constant/apiRouteList";
 
@@ -128,6 +129,11 @@ const TimeBasedEnergyComparison = ({ theme }) => {
 
     const root = am5.Root.new("TimeFramComparisonChart");
     root.setThemes([am5themes_Animated.new(root)]);
+    if (theme === "dark") {
+      root.setThemes([am5themes_Animated.new(root), am5themes_Dark.new(root)]);
+    } else {
+      root.setThemes([am5themes_Animated.new(root)]);
+    }
 
     root._logo?.dispose();
 
@@ -234,22 +240,6 @@ const TimeBasedEnergyComparison = ({ theme }) => {
 
     previousSeries.data.setAll(processedData.seriesData);
 
-    // Add value labels on bars
-    [currentSeries, previousSeries].forEach((series) => {
-      series.bullets.push(() =>
-        am5.Bullet.new(root, {
-          locationY: 0,
-          sprite: am5.Label.new(root, {
-            text: "{valueY}",
-            fill: root.interfaceColors.get("alternativeText"),
-            centerY: 0,
-            centerX: am5.p50,
-            populateText: true,
-          }),
-        })
-      );
-    });
-
     legend.data.setAll([currentSeries, previousSeries]);
 
     newChart.appear(1000, 100);
@@ -260,7 +250,7 @@ const TimeBasedEnergyComparison = ({ theme }) => {
         root.dispose();
       }
     };
-  }, [apiData, dataType, timeFrame, meterType]);
+  }, [apiData, dataType, timeFrame, meterType, theme]);
 
   return (
     <div
