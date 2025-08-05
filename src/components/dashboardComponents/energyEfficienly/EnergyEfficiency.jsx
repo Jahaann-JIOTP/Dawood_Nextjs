@@ -205,7 +205,7 @@ const EnergyEfficiency = ({ theme }) => {
       </div>
       <div className="relative w-full flex-1" style={{ minWidth: 0 }}>
         <div
-          className={`w-full ${expanded ? "h-[90%]" : "h-[15rem]"}`}
+          className={`w-full ${expanded ? "h-[90%]" : "h-[14rem]"}`}
           id="EnergyEfficiencychart"
         />
       </div>

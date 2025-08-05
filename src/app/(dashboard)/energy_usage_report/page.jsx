@@ -282,7 +282,7 @@ const page = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-[240px] h-[35px] block font-sans text-[16px] font-bold text-white no-underline uppercase text-center pt-[4px] mt-[10px] ml-[5px] relative cursor-pointer border-none rounded-[5px] bg-[#1784d9] bg-gradient-to-b from-[#1784d9] to-[#389de9] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-[240px] h-[35px] block font-sans text-[16px] font-bold text-white no-underline uppercase text-center pt-[4px] mt-[10px] ml-[5px] relative cursor-pointer border-none rounded-[5px] bg-[#1f5896]  disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? "Loading..." : "GENERATE REPORT"}
                   </button>

@@ -30,7 +30,7 @@ const Header = ({ handleTabClick, activeTab }) => {
     if (currentTab !== activeTab) {
       handleTabClick(currentTab);
     }
-  }, [pathname]);
+  }, [pathname, activeTab, handleTabClick]);
 
   const fetchUserDetails = async () => {
     const token = localStorage.getItem("token");

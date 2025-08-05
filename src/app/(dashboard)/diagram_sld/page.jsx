@@ -73,7 +73,7 @@ const InitalMeterData = () => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 h-[81vh] border-t-3  rounded-md overflow-auto">
+    <div className="w-full bg-white dark:bg-gray-800 h-[81vh] border-t-3 border-[#1f5896] rounded-md overflow-auto">
       <div className="relative w-[1200px] h-[600px] mx-auto">
         {MeterData.map((meter) => (
           <button

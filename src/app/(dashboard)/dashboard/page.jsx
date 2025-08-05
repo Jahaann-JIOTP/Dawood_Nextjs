@@ -202,7 +202,7 @@ const DashboardPage = () => {
             <TimeBasedEnergyComparison theme={theme} />
           </div>
         </div>
-        <div className="flex flex-col gap-2 sm:gap-4 flex-1 min-h-0 w-full">
+        <div className="flex  flex-col gap-2 sm:gap-4 flex-1 w-full">
           <div className="bg-white dark:bg-gray-800 shadow-md border-t-3 border-[#1f5897] rounded-md transition-colors duration-300 flex-1 w-full overflow-hidden flex flex-col">
             <div className="px-2 sm:px-4 py-2  dark:bg-gray-800 flex-shrink-0">
               <h3 className="text-[16px] font-semibold text-[#1F5897] dark:text-[#D1D5DB] transition-colors duration-300">

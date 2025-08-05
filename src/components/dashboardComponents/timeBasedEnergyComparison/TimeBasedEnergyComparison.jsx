@@ -257,7 +257,7 @@ const TimeBasedEnergyComparison = ({ theme }) => {
       className={`w-full bg-white dark:bg-gray-800 rounded-md  border-t-3 border-[#1f5897] px-4 py-2 ${
         expand === true
           ? "absolute z-50 top-0 left-0 h-screen"
-          : "relative h-[19rem]"
+          : "relative h-[18rem]"
       }`}
     >
       <div className="flex items-center justify-between">
@@ -323,7 +323,7 @@ const TimeBasedEnergyComparison = ({ theme }) => {
         <div
           id="TimeFramComparisonChart"
           className={`w-full`}
-          style={{ height: expand === true ? "90%" : "14.5rem" }}
+          style={{ height: expand === true ? "90%" : "14rem" }}
         ></div>
       )}
     </div>

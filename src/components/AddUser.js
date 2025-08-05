@@ -21,16 +21,29 @@ export default function AddUser() {
     setToken(localStorage.getItem("token"));
   }, []);
 
-  useEffect(() => {
-    if (token) fetchRoles();
-  }, [token]);
 
+
+  // const fetchRoles = async () => {
+  //   try {
+  //     const res = await axios.get(`${baseUrl}/roles/allrole`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     setRoles(res.data.data || []); // ✅ correct key
+  //   } catch (err) {
+  //     Swal.fire(
+  //       "Error",
+  //       err.response?.data?.message || "Failed to fetch roles!",
+  //       "error"
+  //     );
+  //   }
+  // };
+  useEffect(() => {
   const fetchRoles = async () => {
     try {
       const res = await axios.get(`${baseUrl}/roles/allrole`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setRoles(res.data.data || []); // ✅ correct key
+      setRoles(res.data.data || []);
     } catch (err) {
       Swal.fire(
         "Error",
@@ -39,6 +52,9 @@ export default function AddUser() {
       );
     }
   };
+
+  if (token) fetchRoles();
+}, [token]);
 
   const handleAddUser = async () => {
     if (
@@ -64,6 +80,9 @@ export default function AddUser() {
       Swal.fire("Error", message, "error");
     }
   };
+  //   useEffect(() => {
+  //   if (token) fetchRoles();
+  // }, [roles,token]);
 
   return (
     <div>

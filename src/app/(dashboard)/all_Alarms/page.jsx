@@ -96,7 +96,7 @@ const AlarmTable = () => {
   };
 
   return (
-    <div className="relative w-full h-[43vw] max-md:h-[83vh]  mt-[-7px] rounded-lg border-t-4 border-t-[#1F5897] overflow-hidden shadow-md mt-[-7px]">
+    <div className="relative w-full h-[43vw] max-md:h-[83vh]  rounded-lg border-t-3 border-t-[#1F5897] overflow-hidden shadow-md">
       {/* Header */}
       <div
         className="absolute inset-0 bg-[#fff] dark:bg-gray-800"

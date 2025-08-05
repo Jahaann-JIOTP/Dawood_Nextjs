@@ -9,7 +9,7 @@ export default function UserManagement() {
   const [activeTab, setActiveTab] = useState("roles");
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg shadow-lg border-2    max-w-screen h-[81vh] overflow-y-auto ">
+    <div className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg shadow-lg border-t-3 border-[#1f5896] max-w-screen h-[81vh] overflow-y-auto ">
       <div className="text-[#1d5998] font-raleway dark:text-white text-lg md:text-[22.34px] font-semibold leading-[125%] mb-4 md:mb-5">
         User Management
       </div>

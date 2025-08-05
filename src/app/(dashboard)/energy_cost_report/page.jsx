@@ -466,9 +466,9 @@ const EnergyCostReport = () => {
 
   if (isSubmitted && fetchedData && fetchedData.length > 0) {
     return (
-      <div className="relative shadow-lg rounded-[8px] w-full mt-[-7px]">
+      <div className="relative shadow-lg rounded-md  w-full">
         <div
-          className="absolute inset-0 bg-white dark:bg-gray-800"
+          className="absolute inset-0 bg-white rounded-md dark:bg-gray-800 border-t-3 border-[#1f5896]"
           style={{ opacity: 1 }}
         />
         <div className="relative z-10 p-6 h-[39.9vw] flex flex-col">
@@ -525,20 +525,20 @@ const EnergyCostReport = () => {
             </div>
           </div>
 
-          <div className="w-full h-[2px] bg-gradient-to-r from-blue-500 via-green-500 to-red-500 my-4" />
+          <div className="w-full h-[2px] bg-gradient-to-r from-blue-500 via-green-500 to-red-500 mb-4" />
 
           <div className="mb-4">
             <div className="flex justify-between">
               <div>
                 <button
                   onClick={handleExport}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                  className="px-4 py-2 bg-[#1f5896] text-white rounded-md hover:bg-[#1f5896]"
                 >
                   Export
                 </button>
               </div>
               <div className="text-right">
-                <h2 className="text-lg font-bold text-blue-700">
+                <h2 className="text-lg font-bold text-[#1f5896]">
                   Billing Report
                 </h2>
                 <div className="text-gray-600 dark:text-white mt-2">
@@ -553,6 +553,7 @@ const EnergyCostReport = () => {
             </div>
           </div>
 
+          {/* <div className="flex-1 overflow-y-auto pr-2 hide-scrollbar"> */}
           <div className="flex-1 overflow-y-auto pr-2 hide-scrollbar">
             <div>
               <table className="w-full border-collapse border border-gray-200">
@@ -716,10 +717,10 @@ const EnergyCostReport = () => {
   return (
     <div
       id="energy-cost-report"
-      className="relative shadow-lg rounded-[8px] w-full h-[43.5vw] max-md:h-[83vh] border-t-2 border-red-600 mt-[-7px]"
+      className="relative shadow-lg  rounded-md w-full h-[43.5vw] max-md:h-[83vh] border-t-2"
     >
       <div
-        className="absolute inset-0 bg-white dark:bg-gray-800 border-t-2 border-red-600"
+        className="absolute inset-0 bg-white rounded-md dark:bg-gray-800 border-t-3 border-[#1f5896]"
         style={{ opacity: 1 }}
       />
       <div className="relative z-10 p-6">
@@ -814,7 +815,7 @@ const EnergyCostReport = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-[240px] h-[35px] block font-sans text-[16px] font-bold text-white no-underline uppercase text-center pt-[4px] mt-[10px] ml-[5px] relative cursor-pointer border-none rounded-[5px] bg-[#1784d9] bg-gradient-to-b from-[#1784d9] to-[#389de9] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-[240px] h-[35px] block font-sans text-[16px] font-bold text-white no-underline uppercase text-center pt-[4px] mt-[10px] ml-[5px] relative cursor-pointer border-none rounded-[5px] bg-[#1f5896] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Loading..." : "GENERATE REPORT"}
             </button>

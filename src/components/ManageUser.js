@@ -87,7 +87,7 @@ export default function ViewUsers() {
       if (result.isConfirmed) {
         try {
           await axios.delete(`${baseUrl}/users/delete/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${token}`},
           });
           Swal.fire(
             "Deleted!",

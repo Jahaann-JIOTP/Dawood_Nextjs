@@ -20,10 +20,10 @@ export default function DashboardLayout({ children }) {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const token = useSelector((state) => state.auth.token);
 
-  useEffect(() => {
-    const currentTab = getActiveTabFromPathname(pathname);
-    setActiveTab(currentTab);
-  }, []);
+  // useEffect(() => {
+  //   const currentTab = getActiveTabFromPathname(pathname);
+  //   setActiveTab(currentTab);
+  // }, [pathname]);
   useEffect(() => {
     const currentTab = getActiveTabFromPathname(pathname);
     setActiveTab(currentTab);
