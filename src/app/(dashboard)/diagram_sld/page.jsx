@@ -31,7 +31,7 @@ const InitalMeterData = () => {
     {
       activePowerTotalTag: apiData?.M1_Active_Power_Total_kW,
       activeCurrentAvgTag: apiData?.M1_Current_Average_A,
-      activeVoltageAvgTag: apiData?.["M1_Voltage_L-L_Phase_CA_V"],
+      activeVoltageAvgTag: apiData?.["M1_Voltage_L-L_Average_V"],
       top: 420,
       left: 176,
     },
@@ -39,7 +39,7 @@ const InitalMeterData = () => {
     {
       activePowerTotalTag: apiData?.M2_Active_Power_Total_kW,
       activeCurrentAvgTag: apiData?.M2_Current_Average_A,
-      activeVoltageAvgTag: apiData?.["M2_Voltage_L-L_Phase_CA_V"],
+      activeVoltageAvgTag: apiData?.["M2_Voltage_L-L_Average_V"],
       top: 420,
       left: 903,
     },
