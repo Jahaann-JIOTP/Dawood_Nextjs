@@ -24,7 +24,7 @@ const LogDetails = () => {
   const getMeterLogsData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/logs_data`, {
+      const response = await fetch(`http://110.39.23.106:5034/logs_data`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
