@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: "/api/meter-data",
-        destination: "http://localhost:5000/meter-data",
+        destination: "http://110.39.23.106:5034/meter-data",
       },
     ];
   },

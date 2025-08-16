@@ -1,4 +1,5 @@
 "use client";
+import config from "@/constant/apiRouteList";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 
@@ -184,7 +185,7 @@ const EnergyUsageReport = () => {
         };
 
         try {
-          const response = await fetch("http://localhost:5000/energy_usage", {
+          const response = await fetch(`${config.BASE_URL}/energy_usage`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -282,7 +283,7 @@ const EnergyUsageReport = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/energy_usage", {
+      const response = await fetch(`${config.BASE_URL}/energy_usage`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

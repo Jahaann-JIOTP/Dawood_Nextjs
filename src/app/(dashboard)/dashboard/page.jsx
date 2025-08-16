@@ -13,6 +13,7 @@ import TimePeriodSelector from "@/components/timePeriodSelector/TimePeriodSelect
 import EnergyEfficiency from "@/components/dashboardComponents/energyEfficienly/EnergyEfficiency";
 import TimeBasedEnergyComparison from "@/components/dashboardComponents/timeBasedEnergyComparison/TimeBasedEnergyComparison";
 import { useTheme } from "next-themes";
+import config from "@/constant/apiRouteList";
 
 const DashboardPage = () => {
   const { theme } = useTheme();
@@ -47,7 +48,7 @@ const DashboardPage = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/dashboard/dashboard-data",
+        `${config.BASE_URL}/dashboard/dashboard-data`,
         {
           method: "POST",
           headers: {
@@ -78,7 +79,7 @@ const DashboardPage = () => {
   const fetchRealTimeData = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/dashboard/dashboard-data4`,
+        `${config.BASE_URL}/dashboard/dashboard-data4`,
         {
           method: "GET",
         }

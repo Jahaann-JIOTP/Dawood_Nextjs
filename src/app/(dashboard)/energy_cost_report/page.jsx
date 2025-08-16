@@ -1,4 +1,5 @@
 "use client";
+import config from "@/constant/apiRouteList";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 
@@ -182,7 +183,7 @@ const EnergyCostReport = () => {
         };
 
         try {
-          const response = await fetch("http://localhost:5000/energy-cost", {
+          const response = await fetch(`${config.BASE_URL}/energy-cost`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -279,7 +280,7 @@ const EnergyCostReport = () => {
     setError(null); // Clear previous errors
 
     try {
-      const response = await fetch("http://localhost:5000/energy-cost", {
+      const response = await fetch(`${config.BASE_URL}/energy-cost`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -452,8 +453,7 @@ const EnergyCostReport = () => {
   if (isSubmitted && (!fetchedData || fetchedData.length === 0)) {
     return (
       <div className="p-6 text-red-500">
-        No data available. Please try again or check the API server at
-        http://localhost:5000/energy-cost.
+        No data available. Please try again
         <button
           onClick={() => setIsSubmitted(false)}
           className="ml-4 px-2 py-1 bg-blue-500 text-white rounded"

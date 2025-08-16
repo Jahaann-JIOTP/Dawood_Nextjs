@@ -37,7 +37,7 @@ const Header = ({ handleTabClick, activeTab }) => {
     if (!token) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/users/myprofile`, {
+      const res = await fetch(`${config.BASE_URL}${config.USER.PROFILE}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
