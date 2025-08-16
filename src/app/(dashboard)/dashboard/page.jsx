@@ -94,6 +94,10 @@ const DashboardPage = () => {
   };
   useEffect(() => {
     fetchRealTimeData();
+    const interval = setInterval(() => {
+      fetchRealTimeData();
+    }, 5000);
+    return ()=> clearInterval(interval)
   }, []);
 
   // useEffect to fetch data on component mount

@@ -5,6 +5,8 @@ import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_kelly from "@amcharts/amcharts4/themes/kelly";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import { IoChevronDown } from "react-icons/io5";
+import { IoChevronUp } from "react-icons/io5";
 import { useTheme } from "next-themes";
 import Swal from "sweetalert2";
 import CustomLoader from "@/components/Customloader/Customloader";
@@ -488,7 +490,7 @@ function CustomTrend() {
         ],
       },
       {
-        label: "Data",
+        label: "DATA",
         menu: [
           {
             type: "pdf",
@@ -541,7 +543,8 @@ function CustomTrend() {
   }, [chart]);
 
   return (
-    <div className="relative flex-shrink-0 w-full px-2 py-2 sm:px-4 sm:py-4 md:px-6 md:py-6 lg:px-8 lg:py-8 h-auto min-h-[500px] lg:h-[81vh] bg-white dark:bg-gray-800 border-t-3 border-[#1f5896] rounded-[8px] shadow-md">
+    <div 
+    className="relative flex-shrink-0 w-full px-2 py-2 sm:px-4 sm:py-4 md:px-6 md:py-6 lg:px-8 lg:py-8 h-[90vh] overflow-y-auto lg:h-[81vh] bg-white dark:bg-gray-800 border-t-3 border-[#1f5896] rounded-[8px] shadow-md">
       <div className="relative z-10 h-full flex flex-col">
         {/* Header */}
         <div className="mb-4 sm:mb-6">
@@ -579,6 +582,7 @@ function CustomTrend() {
             <input
               type="date"
               value={endDate}
+              min={startDate}
               onChange={(e) => setEndDate(e.target.value)}
               className="w-full p-2 sm:p-3 text-sm sm:text-base border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -604,7 +608,7 @@ function CustomTrend() {
                 {selectedMeter || "Select Meter"}
               </span>
               <span className="float-right mt-0.5">
-                {showMeters ? "▲" : "▼"}
+                {showMeters ? <IoChevronUp/> : <IoChevronDown/>}
               </span>
             </button>
             {showMeters && (
@@ -657,7 +661,7 @@ function CustomTrend() {
                   : "Select Parameters"}
               </span>
               <span className="float-right mt-0.5">
-                {showParameters ? "▲" : "▼"}
+                {showParameters ? <IoChevronUp/> : <IoChevronDown/>}
               </span>
             </button>
             {showParameters && selectedMeter && (
@@ -700,7 +704,11 @@ function CustomTrend() {
                 selectedMeter &&
                 selectedParameters.length > 0
                   ? "No data available for the selected parameters"
-                  : "Kindly select parameter to view chart"}
+                  : (<div className="flex items-center justify-center flex-col gap-2">
+
+                    <img src="../../../trend_icon.svg" className="w-70" alt="" />
+                    <span>Select Desired Filters to view Trend!</span>
+                  </div>)}
               </div>
             </div>
           )}

@@ -67,6 +67,25 @@ const TimeBasedEnergyComparison = ({ theme }) => {
     { value: "export", label: "Export" },
   ];
 
+  // Format hours into readable 12-hour format
+  const formatHour = (hourString) => {
+    const hour = parseInt(hourString, 10);
+    const suffix = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+    return `${displayHour} ${suffix}`;
+  };
+  const formatWeekDay = (groupString) => {
+  const match = groupString.match(/\((.*?)\)/); // extract text inside ()
+  return match ? match[1] : groupString; // return day name or fallback
+};
+const formatMonthWeek = (index) => {
+  return `Week ${index + 1}`;
+};
+const formatYearQuater = (index) => {
+  return `Quater ${index + 1}`;
+};
+
+
   // Get legend labels based on time frame
   const getLegendLabels = (timeFrame) => {
     switch (timeFrame) {
@@ -100,8 +119,19 @@ const TimeBasedEnergyComparison = ({ theme }) => {
         group: currItem.group,
         diff: 0,
       };
+
       return {
-        group: currItem.group,
+        group: currItem.group, // raw
+        groupLabel:
+          timeFrame === "day"
+            ? formatHour(currItem.group)
+            :timeFrame==="week"
+            ?formatWeekDay(currItem.group) 
+            :timeFrame==="month"
+            ?formatMonthWeek(index)
+            :timeFrame==="year"
+            ?formatYearQuater(index)
+            :currItem.group,
         currentValue: currItem.diff,
         previousValue: prevItem.diff,
       };
@@ -170,9 +200,9 @@ const TimeBasedEnergyComparison = ({ theme }) => {
 
     const xAxis = newChart.xAxes.push(
       am5xy.CategoryAxis.new(root, {
-        categoryField: "group",
+        categoryField: "groupLabel", // ✅ use formatted label
         renderer: xRenderer,
-        tooltip: am5.Tooltip.new(root, {}),
+        tooltip: am5.Tooltip.new(root, { labelText: "{groupLabel}" }),
       })
     );
     xAxis.get("renderer").labels.template.setAll({
@@ -201,7 +231,7 @@ const TimeBasedEnergyComparison = ({ theme }) => {
         xAxis: xAxis,
         yAxis: yAxis,
         valueYField: "currentValue",
-        categoryXField: "group",
+        categoryXField: "groupLabel", // ✅ use formatted label
         clustered: true,
       })
     );
@@ -224,7 +254,7 @@ const TimeBasedEnergyComparison = ({ theme }) => {
         xAxis: xAxis,
         yAxis: yAxis,
         valueYField: "previousValue",
-        categoryXField: "group",
+        categoryXField: "groupLabel", // ✅ use formatted label
         clustered: true,
       })
     );
